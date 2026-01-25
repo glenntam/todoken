@@ -1,6 +1,6 @@
-// Package router is a custom CRUD router based on
-// go-chi, scs and sqlc.
-package router
+// Package matchstick is a web app boilerplate library
+// based on common patterns using go-chi, scs and sqlc.
+package matchstick
 
 import (
 	"database/sql"
@@ -12,8 +12,10 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
+// Router contains a mux and the interdependant db models, session manager, and templates.
 type Router struct {
 	chi.Router
+
 	models    *models.Queries
 	sessions  *scs.SessionManager
 	templates *template.Template

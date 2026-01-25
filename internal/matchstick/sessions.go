@@ -1,4 +1,4 @@
-package router
+package matchstick
 
 import (
 	"net/http"
@@ -7,9 +7,14 @@ import (
 	"github.com/alexedwards/scs/v2"
 )
 
+const (
+	daysPerWeek = 7
+	hoursPerDay = 24
+)
+
 func newSessionManager() *scs.SessionManager {
 	sm := scs.New()
-	sm.Lifetime = 7 * 24 * time.Hour
+	sm.Lifetime = daysPerWeek * hoursPerDay * time.Hour
 	sm.Cookie.HttpOnly = true
 	sm.Cookie.SameSite = http.SameSiteLaxMode
 	return sm

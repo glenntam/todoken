@@ -2,27 +2,35 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"log/slog"
-	"net/http"
 	"os"
+	"time"
 
-	"github.com/glenntam/todoken/internal/router"
+	"github.com/glenntam/todoken/internal/matchstick"
 
 	"github.com/glenntam/envwrapper"
 	"github.com/glenntam/multislog"
 	_ "modernc.org/sqlite"
 )
 
+const (
+	dbStartupTimeout    = 5 * time.Second
+	sqlcQueriesLocation = "./sqlc/schema.sql"
+	templatesGlob       = "templates/*.gohtml"
+)
+
 func main() {
 	// Environment variables:
 	cfg := map[string]any{
 		"TODOKEN_TIMEZONE": "UTC",
-		"TODOKEN_PORT":     "8080",
+		"TODOKEN_PORT":     ":8080",
 		"TODOKEN_DBFILE":   "todoken.db",
 		"TODOKEN_LOGFILE":  "logfile.json",
 	}
 	env := envwrapper.Parse(cfg)
+	defer envwrapper.WipeSecrets(env)
 
 	// Logger:
 	msl := multislog.New(
@@ -38,22 +46,22 @@ func main() {
 	if err != nil {
 		panic("Couldn't open sqlite file")
 	}
-	schema, err := os.ReadFile("./sqlc/schema.sql")
+	//    create tables if they don't exist
+	schema, err := os.ReadFile(sqlcQueriesLocation)
 	if err != nil {
 		panic("Couldn't read sqlc schema file")
 	}
-	_, err = conn.Exec(string(schema))
+	ctx, cancel := context.WithTimeout(context.Background(), dbStartupTimeout)
+	defer cancel()
+	_, err = conn.ExecContext(ctx, string(schema))
 	if err != nil {
 		panic("Error trying to execute schema creation")
 	}
 
 	// Router:
-	r := router.NewRouter("templates/*.gohtml", conn)
+	r := matchstick.NewRouter(templatesGlob, conn)
 
-	// Start Webserver:
-	slog.Info("listening on :" + env.Str["TODOKEN_PORT"])
-	err = http.ListenAndServe(":"+env.Str["TODOKEN_PORT"], r)
-	if err != nil {
-		panic("Couldn't start http server")
-	}
+	// Webserver:
+	ws := matchstick.NewWebServer(env.Str["TODOKEN_PORT"], r)
+	ws.Start()
 }

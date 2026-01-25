@@ -18,7 +18,7 @@ VALUES (?, ?, ?)
 type CreateSessionParams struct {
 	Token     string
 	UserID    int64
-	ExpiresAt int64
+	ExpiresAt string
 }
 
 func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) error {
@@ -33,7 +33,7 @@ VALUES (?, ?, ?, ?)
 
 type CreateTaskParams struct {
 	UserID    int64
-	CreatedAt int64
+	CreatedAt string
 	Category  int64
 	Text      string
 }
@@ -56,7 +56,7 @@ VALUES (?, ?, ?)
 type CreateUserParams struct {
 	Email        string
 	PasswordHash string
-	CreatedAt    int64
+	CreatedAt    string
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
@@ -151,7 +151,7 @@ UPDATE tasks SET category = ?, text = ?, completed_at = ? WHERE id = ?
 type UpdateTaskParams struct {
 	Category    int64
 	Text        string
-	CompletedAt sql.NullInt64
+	CompletedAt sql.NullString
 	ID          int64
 }
 

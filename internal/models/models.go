@@ -11,16 +11,16 @@ import (
 type Session struct {
 	Token     string
 	UserID    int64
-	ExpiresAt int64
+	ExpiresAt string
 }
 
 type Task struct {
 	ID          int64
 	UserID      int64
-	CreatedAt   int64
+	CreatedAt   string
 	Category    int64
 	Text        string
-	CompletedAt sql.NullInt64
+	CompletedAt sql.NullString
 	Foreign     interface{}
 }
 
@@ -28,5 +28,5 @@ type User struct {
 	ID           int64
 	Email        string
 	PasswordHash string
-	CreatedAt    int64
+	CreatedAt    string
 }

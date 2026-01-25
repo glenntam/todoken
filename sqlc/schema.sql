@@ -2,22 +2,22 @@ CREATE TABLE IF NOT EXISTS users (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	email TEXT NOT NULL UNIQUE,
 	password_hash TEXT NOT NULL,
-	created_at INTEGER NOT NULL
+	created_at TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS sessions (
 	token TEXT PRIMARY KEY,
 	user_id INTEGER NOT NULL,
-	expires_at INTEGER NOT NULL,
+	expires_at TEXT NOT NULL,
 	FOREIGN KEY(user_id) REFERENCES users(id)
 );
 
 CREATE TABLE IF NOT EXISTS tasks (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	user_id INTEGER NOT NULL,
-	created_at INTEGER NOT NULL,
+	created_at TEXT NOT NULL,
 	category INTEGER NOT NULL,
 	text TEXT NOT NULL,
-	completed_at INTEGER,
+	completed_at TEXT,
 	FOREIGN KEY(user_id) REFERENCESS users(id)
 );
