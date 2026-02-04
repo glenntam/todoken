@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/glenntam/todoken/internal/matchstick"
+	"github.com/glenntam/todoken/internal/service"
 
 	"github.com/glenntam/envwrapper"
 	"github.com/glenntam/multislog"
@@ -19,6 +20,7 @@ const (
 	dbStartupTimeout    = 5 * time.Second
 	sqlcQueriesLocation = "./sqlc/schema.sql"
 	templatesGlob       = "templates/*.gohtml"
+	staticDir           = "static"
 )
 
 func main() {
@@ -58,8 +60,10 @@ func main() {
 		panic("Error trying to execute schema creation")
 	}
 
+	// Services:
+	s :=
 	// Router:
-	r := matchstick.NewRouter(templatesGlob, conn)
+	r := matchstick.NewRouter(templatesGlob, staticDir, s, conn)
 
 	// Webserver:
 	ws := matchstick.NewWebServer(env.Str["TODOKEN_PORT"], r)

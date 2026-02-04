@@ -5,7 +5,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/glenntam/todoken/internal/models"
+	"github.com/glenntam/todoken/internal/model"
+	"github.com/glenntam/todoken/internal/service"
 
 	"github.com/alexedwards/argon2id"
 )

@@ -5,8 +5,10 @@ package matchstick
 import (
 	"database/sql"
 	"html/template"
+	"net/http"
 
-	"github.com/glenntam/todoken/internal/models"
+	"github.com/glenntam/todoken/internal/model"
+	// "github.com/glenntam/todoken/internal/service"
 
 	"github.com/alexedwards/scs/v2"
 	"github.com/go-chi/chi/v5"
@@ -16,7 +18,7 @@ import (
 type Router struct {
 	chi.Router
 
-	models    *models.Queries
+	models    *model.Queries
 	sessions  *scs.SessionManager
 	templates *template.Template
 }
@@ -26,16 +28,18 @@ type Router struct {
 //
 // tpls is a string glob to a directory of templates.
 // conn is a DB connection.
-func NewRouter(tpls string, conn *sql.DB) *Router {
-	t := template.Must(template.ParseGlob(tpls))
-	sm := newSessionManager()
-
+func NewRouter(tpls, staticDir string, conn *sql.DB) *Router {
 	r := &Router{
 		Router:    chi.NewRouter(),
-		models:    models.New(conn),
-		sessions:  sm,
-		templates: t,
+		model:     model.New(conn),
+		sessions:  newSessionManager(),
+		templates: template.Must(template.ParseGlob(tpls)),
 	}
+
+	r.Handle(
+		"/"+staticDir+"/*",
+		http.StripPrefix("/"+staticDir+"/", http.FileServer(http.Dir("./"+staticDir))),
+	)
 
 	r.Use(r.sessions.LoadAndSave)
 	r.Get("/login", r.loginForm)

@@ -1,6 +1,6 @@
 -- name: CreateUser :exec
-INSERT INTO users (email, password_hash, created_at)
-VALUES (?, ?, ?);
+INSERT INTO users (email, password_hash)
+VALUES (?, ?);
 
 -- name: GetUserByEmail :one
 SELECT * FROM users WHERE email = ?;
@@ -16,8 +16,8 @@ SELECT * FROM sessions WHERE token = ?;
 DELETE FROM sessions WHERE token = ?;
 
 -- name: CreateTask :exec
-INSERT INTO tasks (user_id, created_at, category, text)
-VALUES (?, ?, ?, ?);
+INSERT INTO tasks (user_id, category, text)
+VALUES (?, ?, ?);
 
 -- name: GetTasksByUser :many
 SELECT * FROM tasks WHERE user_id = ? ORDER BY created_at;

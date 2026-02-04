@@ -17,5 +17,8 @@ func newSessionManager() *scs.SessionManager {
 	sm.Lifetime = daysPerWeek * hoursPerDay * time.Hour
 	sm.Cookie.HttpOnly = true
 	sm.Cookie.SameSite = http.SameSiteLaxMode
+	session.Cookie.Persist = true
+	session.Cookie.Path = "/"
+	session.Cookie.Secure = false // true if HTTPS
 	return sm
 }

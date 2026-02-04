@@ -3,7 +3,7 @@
 //   sqlc v1.30.0
 // source: queries.sql
 
-package models
+package model
 
 import (
 	"context"
@@ -27,40 +27,33 @@ func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) er
 }
 
 const createTask = `-- name: CreateTask :exec
-INSERT INTO tasks (user_id, created_at, category, text)
-VALUES (?, ?, ?, ?)
+INSERT INTO tasks (user_id, category, text)
+VALUES (?, ?, ?)
 `
 
 type CreateTaskParams struct {
-	UserID    int64
-	CreatedAt string
-	Category  int64
-	Text      string
+	UserID   int64
+	Category int64
+	Text     string
 }
 
 func (q *Queries) CreateTask(ctx context.Context, arg CreateTaskParams) error {
-	_, err := q.db.ExecContext(ctx, createTask,
-		arg.UserID,
-		arg.CreatedAt,
-		arg.Category,
-		arg.Text,
-	)
+	_, err := q.db.ExecContext(ctx, createTask, arg.UserID, arg.Category, arg.Text)
 	return err
 }
 
 const createUser = `-- name: CreateUser :exec
-INSERT INTO users (email, password_hash, created_at)
-VALUES (?, ?, ?)
+INSERT INTO users (email, password_hash)
+VALUES (?, ?)
 `
 
 type CreateUserParams struct {
 	Email        string
 	PasswordHash string
-	CreatedAt    string
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
-	_, err := q.db.ExecContext(ctx, createUser, arg.Email, arg.PasswordHash, arg.CreatedAt)
+	_, err := q.db.ExecContext(ctx, createUser, arg.Email, arg.PasswordHash)
 	return err
 }
 
