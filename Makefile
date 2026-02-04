@@ -1,28 +1,46 @@
-APP := todoken
+# ==================================================================================== #
+# HELPERS
+# ==================================================================================== #
 
-.PHONY: all build clean check run sqlc update
+## help: print this help message
+.PHONY: help
+help:
+	@echo 'Usage:'
+	@sed -n 's/^##//p' ${MAKEFILE_LIST} | column -t -s ':' |  sed -e 's/^/ /'
 
-all: sqlc check run clean
 
-build:
-	go build -o $(APP) ./cmd/web/
 
-clean:
-	rm -f ./$(APP)
+# ==================================================================================== #
+# SQL MIGRATIONS
+# ==================================================================================== #
 
-check:
-	gofumpt -d -e -extra . | colordiff | \less -iMRX
-	go vet ./...
-	golangci-lint run -E asciicheck,bidichk,bodyclose,canonicalheader,containedctx,contextcheck,copyloopvar,decorder,dogsled,dupl,dupword,durationcheck,embeddedstructfieldcheck,err113,errcheck,errchkjson,errname,errorlint,exhaustive,exptostd,fatcontext,forcetypeassert,funcorder,gocheckcompilerdirectives,gochecknoglobals,gochecksumtype,gocognit,goconst,gocritic,gocyclo,godoclint,godot,godox,goheader,gomoddirectives,gomodguard,goprintffuncname,gosec,govet,grouper,iface,importas,inamedparam,ineffassign,interfacebloat,intrange,iotamixing,ireturn,lll,loggercheck,maintidx,makezero,mirror,misspell,mnd,musttag,nakedret,nestif,nilerr,nilnesserr,nilnil,noctx,nolintlint,nonamedreturns,nosprintfhostport,perfsprint,prealloc,predeclared,promlinter,protogetter,reassign,recvcheck,revive,rowserrcheck,sloglint,sqlclosecheck,tagalign,tagliatelle,testableexamples,thelper,tparallel,unconvert,unparam,unqueryvet,unused,usestdlibvars,usetesting,wastedassign,whitespace,wrapcheck,zerologlint --show-stats --color always | \less -iMRFX
-	go test ./...
-	@printf "Press Enter to continue..."; read dummy
+## migrations/new name=$1: create a new database migration
+.PHONY: migrations/new
+migrations/new:
+	go run -tags 'sqlite3' github.com/golang-migrate/migrate/v4/cmd/migrate@latest create -seq -ext=.sql -dir=./assets/migrations ${name}
 
-run: build
-	./$(APP)
+## migrations/up: apply all up database migrations
+.PHONY: migrations/up
+migrations/up:
+	go run -tags 'sqlite3' github.com/golang-migrate/migrate/v4/cmd/migrate@latest -path=./assets/migrations -database="sqlite3://db.sqlite" up
 
-sqlc:
-	sqlc generate -f ./sqlc/sqlc.yaml
+## migrations/down: apply all down database migrations
+.PHONY: migrations/down
+migrations/down:
+	go run -tags 'sqlite3' github.com/golang-migrate/migrate/v4/cmd/migrate@latest -path=./assets/migrations -database="sqlite3://db.sqlite" down
 
-update:
-	go get -u ./...
-	go mod tidy
+## migrations/goto version=$1: migrate to a specific version number
+.PHONY: migrations/goto
+migrations/goto:
+	go run -tags 'sqlite3' github.com/golang-migrate/migrate/v4/cmd/migrate@latest -path=./assets/migrations -database="sqlite3://db.sqlite" goto ${version}
+
+## migrations/force version=$1: force database migration
+.PHONY: migrations/force
+migrations/force:
+	go run -tags 'sqlite3' github.com/golang-migrate/migrate/v4/cmd/migrate@latest -path=./assets/migrations -database="sqlite3://db.sqlite" force ${version}
+
+## migrations/version: print the current in-use migration version
+.PHONY: migrations/version
+migrations/version:
+	go run -tags 'sqlite3' github.com/golang-migrate/migrate/v4/cmd/migrate@latest -path=./assets/migrations -database="sqlite3://db.sqlite" version
+
