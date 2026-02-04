@@ -6,6 +6,7 @@ require (
 	github.com/alexedwards/scs/sqlite3store v0.0.0-20251002162104-209de6e426de
 	github.com/alexedwards/scs/v2 v2.9.0
 	github.com/andybalholm/cascadia v1.3.3
+	github.com/glenntam/envwrapper v0.1.1
 	github.com/go-chi/chi/v5 v5.2.4
 	github.com/go-playground/form/v4 v4.3.0
 	github.com/golang-migrate/migrate/v4 v4.19.1
@@ -19,7 +20,4 @@ require (
 	golang.org/x/text v0.33.0
 )
 
-require (
-	github.com/glenntam/envwrapper v0.1.1 // indirect
-	github.com/joho/godotenv v1.5.1 // indirect
-)
+require github.com/joho/godotenv v1.5.1 // indirect
